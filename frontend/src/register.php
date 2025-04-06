@@ -1,5 +1,5 @@
 <?php
- include 'connect.php';
+ include '../../backend/connect.php';
 
  if(isset($_POST['signUp']))
  {
@@ -20,7 +20,8 @@
         $insertQuerry = "insert into users (first_name, last_name, email, password, created_at) values ('$firstName','$lastName','$email','$password','$created_at')";
         if($conn->query($insertQuerry) === TRUE)
         {
-            echo("location : index.php");
+            header("location : http://localhost:5173/frontend/src/index.php");
+            
         }
         else {
             echo "Error: " . $insertQuerry . "<br>" . $conn->error;
@@ -40,7 +41,7 @@
         session_start();
         $row = $result->fetch_assoc();
         $_SESSION['email'] = $row['email'];
-        header("location: homepage.php");
+        header(" http://localhost:5173");
         exit();
     }
     else {
