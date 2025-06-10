@@ -7,6 +7,10 @@ import AddServiceForm from '../Components/AddServiceForm';
 import AddAutoServiceForm from '../Components/AddAutoServiceForm';
 import DisplayAutoServices from '../Components/DisplayAutoServices';
 import { useNavigate } from 'react-router-dom';
+import { Modal, Button, Form } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import axios from 'axios';
 
 export default function HomePage() {
   const [showLogin, setShowLogin] = useState(false);
@@ -16,11 +20,19 @@ export default function HomePage() {
   const [showAddAutoService, setShowAddAutoService] = useState(false);
   const navigate = useNavigate();
 
+  // States for booking
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [appointmentDate, setAppointmentDate] = useState(new Date());
+
+  // Load user from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        console.log("Loaded user:", parsedUser);
+        setUser(parsedUser);
       } catch (e) {
         console.error("Error parsing user:", e);
       }
@@ -30,6 +42,35 @@ export default function HomePage() {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
+  };
+
+  const handleConfirmAppointment = () => {
+    if (!appointmentDate) {
+      alert("Please select a date and time.");
+      return;
+    }
+    if (!selectedService) {
+      alert("No service selected.");
+      return;
+    }
+
+    const payload = {
+      user_id: user.id,
+      auto_service_id: selectedService.id,
+      appointment_datetime: appointmentDate.toISOString()
+    };
+
+    axios.post("http://localhost/Licenta/backend/bookAppointment.php", payload)
+      .then(() => {
+        alert("✅ Appointment booked successfully!");
+        setShowBookingModal(false);
+        setSelectedService(null);
+        setAppointmentDate(new Date());
+      })
+      .catch(err => {
+        console.error("Booking failed:", err);
+        alert("❌ Failed to book appointment. Please try again.");
+      });
   };
 
   return (
@@ -47,13 +88,21 @@ export default function HomePage() {
                     Welcome, {user.first_name} ({user.type === 1 ? "User" : user.type === 2 ? "Owner" : "Admin"})!
                   </span>
 
-                  {user?.type === 2 && (
-                    <button className="btn btn-outline-info me-2" onClick={() => setShowAddAutoService(true)}>
-                      Add Auto Service
-                    </button>
-                  )}
-                  {user?.type === 2 && (
-                    <button onClick={() => navigate('/manage-services')} className="btn btn-outline-primary me-2">Manage Services</button>
+                  {user.type === 2 && (
+                    <>
+                      <button
+                        className="btn btn-outline-info me-2"
+                        onClick={() => setShowAddAutoService(true)}
+                      >
+                        Add Auto Service
+                      </button>
+                      <button
+                        onClick={() => navigate('/manage-services')}
+                        className="btn btn-outline-primary me-2"
+                      >
+                        Manage Services
+                      </button>
+                    </>
                   )}
                   <button className="btn btn-danger" onClick={handleLogout}>
                     Logout
@@ -80,13 +129,45 @@ export default function HomePage() {
           Explore our services and book your next appointment online with ease.
         </p>
 
-        <DisplayAutoServices />
+        <DisplayAutoServices
+          user={user}
+          selectedService={selectedService}
+          setSelectedService={setSelectedService}
+          showBookingModal={showBookingModal}
+          setShowBookingModal={setShowBookingModal}
+        />
       </section>
 
       <LoginModal show={showLogin} handleClose={() => setShowLogin(false)} setUser={setUser} />
       <RegisterModal show={showRegister} handleClose={() => setShowRegister(false)} setUser={setUser} />
       <AddServiceForm show={showAddService} handleClose={() => setShowAddService(false)} user={user} />
       <AddAutoServiceForm show={showAddAutoService} handleClose={() => setShowAddAutoService(false)} user={user} />
+
+      {/* Booking Modal controlled from HomePage */}
+      <Modal show={showBookingModal} onHide={() => setShowBookingModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Book Appointment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p><strong>Service:</strong> {selectedService?.name || 'None selected'}</p>
+          <Form.Group>
+            <Form.Label>Select Date & Time</Form.Label>
+            <DatePicker
+              selected={appointmentDate}
+              onChange={date => setAppointmentDate(date)}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="MMMM d, yyyy h:mm aa"
+              className="form-control"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowBookingModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={handleConfirmAppointment}>Confirm</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
