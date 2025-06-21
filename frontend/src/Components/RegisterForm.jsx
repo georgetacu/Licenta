@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { toast } from "react-toastify"; // ✅ Import toast
 
 export default function RegisterModal({ show, handleClose, setUser }) {
   const [firstname, setFirstName] = useState("");
@@ -8,7 +9,7 @@ export default function RegisterModal({ show, handleClose, setUser }) {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
-  const [type, setType] = useState(""); // Default to regular user
+  const [type, setType] = useState("");
 
   const handleRegister = () => {
     axios
@@ -25,11 +26,11 @@ export default function RegisterModal({ show, handleClose, setUser }) {
         const user = response.data.user;
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
-        alert("Registration successful!");
+        toast.success("✅ Registration successful!");
         handleClose();
       })
       .catch((error) => {
-        alert(error.response?.data?.error || "Registration failed.");
+        toast.error(error.response?.data?.error || "❌ Registration failed.");
       });
   };
 

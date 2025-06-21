@@ -7,11 +7,12 @@ import AddServiceForm from './Components/AddServiceForm';
 import AddAutoServiceForm from './Components/AddAutoServiceForm';
 import DisplayAutoServices from './Components/DisplayAutoServices';
 import ManageServices from './Components/ManageServices';
+import BookingModal from './Components/BookingModal';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Modal, Button, Form } from 'react-bootstrap';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -19,9 +20,48 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [showAddService, setShowAddService] = useState(false);
   const [showAddAutoService, setShowAddAutoService] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedHour, setSelectedHour] = useState("");
+  const [availableHours, setAvailableHours] = useState([]);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
-  const [appointmentDate, setAppointmentDate] = useState(new Date());
+
+const handleBookingConfirm = ({ date, hour, service_id }) => {
+  console.log("BookingConfirm received:", { date, hour, service_id });
+
+  if (!user) {
+    alert("You must be logged in to book an appointment.");
+    return;
+  }
+
+  // Create a Date object from the selected date
+  const appointmentDateTime = new Date(date);
+
+  // Extract hours and minutes from the `hour` string (e.g. "14:00")
+  const [h, m] = hour.split(":");
+
+  appointmentDateTime.setHours(parseInt(h), parseInt(m), 0, 0);
+
+  axios.post("http://localhost/Licenta/backend/bookAppointment.php", {
+    user_id: user.id,
+    auto_service_id: selectedService.id,
+    service_id: service_id,
+    appointment_datetime: appointmentDateTime.toISOString(),
+  }, {
+    headers: { "Content-Type": "application/json" },
+  })
+  .then(() => {
+    toast.success("Appointment booked successfully!");
+    setShowBookingModal(false);
+  })
+  .catch((err) => {
+    console.error("Booking failed:", err);
+    toast.error("Failed to book appointment. Please try again.");
+  });
+};
+
+
 
   const navigate = useNavigate();
 
@@ -40,16 +80,51 @@ export default function App() {
     navigate('/');
   };
 
+  // Generate available hours for selected date
+  const generateAvailableHours = (dateStr) => {
+    const hours = [];
+    const now = new Date();
+    const selected = new Date(dateStr);
+
+    for (let h = 9; h <= 18; h++) {
+      const slot = new Date(selected);
+      slot.setHours(h, 0, 0, 0);
+
+      if (slot > now) {
+        hours.push(`${String(h).padStart(2, "0")}:00`);
+      }
+    }
+    return hours;
+  };
+
+  useEffect(() => {
+    if (selectedDate) {
+      setAvailableHours(generateAvailableHours(selectedDate));
+      setSelectedHour(""); // Reset hour on date change
+    }
+  }, [selectedDate]);
+
   const handleConfirmAppointment = () => {
     if (!user || !selectedService) {
       alert("You must be logged in and select a service.");
       return;
     }
 
+    if (!selectedDate || !selectedHour) {
+      alert("Please select date and hour.");
+      return;
+    }
+
+    const [hour, minute] = selectedHour.split(":");
+    const appointment = new Date(selectedDate);
+    appointment.setHours(Number(hour), Number(minute), 0, 0);
+
     axios.post("http://localhost/Licenta/backend/bookAppointment.php", {
       user_id: user.id,
       auto_service_id: selectedService.id,
-      appointment_datetime: appointmentDate.toISOString()
+      appointment_datetime: appointment.toISOString()
+    }, {
+      headers: { "Content-Type": "application/json" }
     })
       .then(() => {
         alert("✅ Appointment booked successfully!");
@@ -61,6 +136,8 @@ export default function App() {
       });
   };
 
+  const todayISO = new Date().toISOString().split("T")[0];
+
   return (
     <div className="min-vh-100 bg-light d-flex">
       {/* Sidebar */}
@@ -68,13 +145,13 @@ export default function App() {
         <div className="bg-dark text-white p-3" style={{ width: '220px', minHeight: '100vh' }}>
           <h5 className="mb-4">User Panel</h5>
           <ul className="nav nav-pills flex-column mb-auto">
-            {user.type === 1 && (
+             
               <li className="nav-item mb-2">
                 <button className="btn btn-outline-light w-100" onClick={() => navigate('/my-appointments')}>
                   My Appointments
                 </button>
               </li>
-            )}
+            
             {user.type === 2 && (
               <>
                 <li className="nav-item mb-2">
@@ -165,31 +242,15 @@ export default function App() {
       <AddServiceForm show={showAddService} handleClose={() => setShowAddService(false)} user={user} />
       <AddAutoServiceForm show={showAddAutoService} handleClose={() => setShowAddAutoService(false)} user={user} />
 
-      {/* Booking Modal */}
-      <Modal show={showBookingModal} onHide={() => setShowBookingModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Book Appointment</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p><strong>Service:</strong> {selectedService?.name}</p>
-          <Form.Group>
-            <Form.Label>Select Date & Time</Form.Label>
-            <DatePicker
-              selected={appointmentDate}
-              onChange={(date) => setAppointmentDate(date)}
-              showTimeSelect
-              timeFormat="HH:mm"
-              timeIntervals={15}
-              dateFormat="MMMM d, yyyy h:mm aa"
-              className="form-control"
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowBookingModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={handleConfirmAppointment}>Confirm</Button>
-        </Modal.Footer>
-      </Modal>
+      <BookingModal
+  show={showBookingModal}
+  handleClose={() => setShowBookingModal(false)}
+  autoServiceId={selectedService?.id}
+  onBook={handleBookingConfirm}
+  selectedServiceId={selectedServiceId}
+  setSelectedServiceId={setSelectedServiceId}
+/>
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </div>
   );
 }
