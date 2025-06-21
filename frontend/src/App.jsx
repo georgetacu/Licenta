@@ -1,6 +1,7 @@
 // App.jsx
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import LoginModal from "./Components/LoginForm";
 import RegisterModal from "./Components/RegisterForm";
 import AddServiceForm from './Components/AddServiceForm';
@@ -13,6 +14,8 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import MyAppointments from './Components/MyAppointments';
+import MyReviews from './Components/MyReviews';
 
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -151,6 +154,14 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
                   My Appointments
                 </button>
               </li>
+              {user?.type === 1 && (
+  <button
+    className="btn btn-outline-light w-100"
+    onClick={() => navigate('/my-reviews')} // or navigate to /my-reviews page
+  >
+    Comentariile mele
+  </button>
+)}
             
             {user.type === 2 && (
               <>
@@ -233,7 +244,11 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
             }
           />
           <Route path="/manage-services" element={<ManageServices user={user} />} />
+          <Route path="/my-appointments" element={<MyAppointments user={user} />} />
+          <Route path="/my-reviews" element={<MyReviews user={user} />} />
         </Routes>
+        
+
       </div>
 
       {/* Modals */}

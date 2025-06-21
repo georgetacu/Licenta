@@ -76,15 +76,7 @@ export default function AddAutoServiceForm({ show, handleClose, user }) {
           </Form.Group>
 
           {/* 👇 New Form Group for Working Hours */}
-          <Form.Group className="mb-2">
-            <Form.Label>Working Hours</Form.Label>
-            <Form.Control
-              name="working_hours"
-              placeholder="ex. Mon–Fri: 08:00–18:00, Sat: 09:00–14:00"
-              value={form.working_hours}
-              onChange={handleChange}
-            />
-          </Form.Group>
+          
         </Form>
       </Modal.Body>
       <Modal.Footer>
