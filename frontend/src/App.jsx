@@ -16,6 +16,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MyAppointments from './Components/MyAppointments';
 import MyReviews from './Components/MyReviews';
+import OwnerAppointments from './Components/OwnerAppointments';
+import CalendarPanel from "./Components/CalendarPanel";
 
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -150,9 +152,10 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
           <ul className="nav nav-pills flex-column mb-auto">
              
               <li className="nav-item mb-2">
+                {user?.type === 1 && (
                 <button className="btn btn-outline-light w-100" onClick={() => navigate('/my-appointments')}>
-                  My Appointments
-                </button>
+                  Programarile mele
+                </button>)}
               </li>
               {user?.type === 1 && (
   <button
@@ -166,7 +169,7 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
             {user.type === 2 && (
               <>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-outline-light w-100" onClick={() => setShowAddAutoService(true)}>
+                  <button className="btn btn-outline-info w-100" onClick={() => setShowAddAutoService(true)}>
                     Add Auto Service
                   </button>
                 </li>
@@ -187,6 +190,24 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
                 <li className="nav-item mb-2">
                   <button className="btn btn-outline-success w-100" onClick={() => navigate('/auto-services-approvals')}>
                     Auto Services Approvals
+                  </button>
+                </li>
+              </>
+            )}
+            {user.type === 2 && (
+              <>
+                <li className="nav-item mb-2">
+                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/owner-appointments')}>
+                    Programari
+                  </button>
+                </li>
+              </>
+            )}
+            {user.type === 2 && (
+              <>
+                <li className="nav-item mb-2">
+                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/calendar')}>
+                    Calendar
                   </button>
                 </li>
               </>
@@ -246,6 +267,8 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
           <Route path="/manage-services" element={<ManageServices user={user} />} />
           <Route path="/my-appointments" element={<MyAppointments user={user} />} />
           <Route path="/my-reviews" element={<MyReviews user={user} />} />
+          <Route path="/owner-appointments" element={<OwnerAppointments user={user} />} />
+          <Route path="/calendar" element={<CalendarPanel user={user} />} />
         </Routes>
         
 
