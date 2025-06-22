@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include 'db.php'; // Use your existing connection
 
+
 if (!isset($data['appointment_id'], $data['user_id'], $data['rating'])) {
     echo json_encode(['error' => 'Missing required fields']);
     http_response_code(400);

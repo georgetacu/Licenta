@@ -18,6 +18,7 @@ import MyAppointments from './Components/MyAppointments';
 import MyReviews from './Components/MyReviews';
 import OwnerAppointments from './Components/OwnerAppointments';
 import CalendarPanel from "./Components/CalendarPanel";
+import UserReviews from "./Components/UserReviews";
 
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -210,6 +211,10 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
                     Calendar
                   </button>
                 </li>
+                <li className="nav-item mb-2">
+                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/user-reviews')}>
+                    Review-uri</button>
+                </li>
               </>
             )}
           </ul>
@@ -269,6 +274,7 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
           <Route path="/my-reviews" element={<MyReviews user={user} />} />
           <Route path="/owner-appointments" element={<OwnerAppointments user={user} />} />
           <Route path="/calendar" element={<CalendarPanel user={user} />} />
+          <Route path="/user-reviews" element={<UserReviews user={user} />} />
         </Routes>
         
 
