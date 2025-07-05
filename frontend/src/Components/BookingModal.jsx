@@ -12,7 +12,6 @@ export default function BookingModal({ show, handleClose, onBook, autoServiceId 
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const services = Array.isArray(availableServices) ? availableServices : [];
 
-  console.log("availableServices in BookingModal:", availableServices);
 
 useEffect(() => {
   if (!autoServiceId) return;
@@ -86,20 +85,19 @@ useEffect(() => {
       service_id: selectedServiceId,
     });
 
-    // Do NOT call handleClose here; let parent close modal on success
   };
 
   return (
     
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Book an Appointment</Modal.Title>
+        <Modal.Title>Efectueaza o programare</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
-          {/* Date Selection */}
+        
           <Form.Group className="mb-3">
-            <Form.Label>Select Date</Form.Label>
+            <Form.Label>Selecteaza Data</Form.Label>
             <Form.Control
               type="date"
               value={selectedDate}
@@ -108,15 +106,14 @@ useEffect(() => {
             />
           </Form.Group>
 
-          {/* Hour Selection */}
           <Form.Group className="mb-3">
-            <Form.Label>Select Hour</Form.Label>
+            <Form.Label>Selecteaza Ora</Form.Label>
             <Form.Select
               value={selectedHour}
               onChange={(e) => setSelectedHour(e.target.value)}
               disabled={!selectedDate || availableHours.length === 0}
             >
-              <option value="">-- Select Hour --</option>
+              <option value=""> - </option>
               {availableHours.map((hour) => (
                 <option key={hour} value={hour}>
                   {hour}
@@ -125,20 +122,19 @@ useEffect(() => {
             </Form.Select>
           </Form.Group>
 
-          {/* Service Dropdown */}
           <Form.Group className="mb-3">
-            <Form.Label>Select Service</Form.Label>
+            <Form.Label>Selecteaza Serviciul</Form.Label>
             <Form.Select
   value={selectedServiceId}
   onChange={(e) => setSelectedServiceId(e.target.value)}
   disabled={availableServices.length === 0}
 >
   <option value="">
-    {availableServices.length === 0 ? "-- No services available --" : "-- Select Service --"}
+    {availableServices.length === 0 ? "Nu sunt servicii valabile" : " - "}
   </option>
   {availableServices.map((service) => (
     <option key={service.id} value={service.id}>
-      {service.title}
+      {service.title} - {service.price} RON
     </option>
   ))}
 </Form.Select>
@@ -148,14 +144,14 @@ useEffect(() => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
-          Cancel
+          Anuleaza
         </Button>
         <Button
-          variant="primary"
+          variant="success"
           onClick={handleBooking}
           disabled={!selectedDate || !selectedHour || !selectedServiceId}
         >
-          Book
+          Efectueaza
         </Button>
       </Modal.Footer>
     </Modal>

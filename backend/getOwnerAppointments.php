@@ -20,22 +20,21 @@ if (!isset($data['owner_id'])) {
 
 $owner_id = (int)$data['owner_id'];
 
-// Get all appointments for auto services owned by this owner
 $sql = "
 SELECT
   a.id,
   a.appointment_datetime,
   a.status,
-  concat(u.first_name, ' ', u.last_name) AS user_name,
+  CONCAT(u.first_name, ' ', u.last_name) AS user_name,
   s.title AS service_title,
+  auto_svc.id AS auto_service_id,
   auto_svc.name AS auto_service_name
 FROM appointments AS a
 JOIN users AS u ON a.user_id = u.id
 JOIN services AS s ON a.service_id = s.id
 JOIN auto_services AS auto_svc ON a.auto_service_id = auto_svc.id
-WHERE auto_svc.user_id = ?  -- this is the owner's user_id
-ORDER BY a.appointment_datetime desc;
-
+WHERE auto_svc.user_id = ?
+ORDER BY a.appointment_datetime DESC
 ";
 
 $stmt = $conn->prepare($sql);
@@ -50,4 +49,3 @@ while ($row = $result->fetch_assoc()) {
 }
 
 echo json_encode($appointments);
-?>

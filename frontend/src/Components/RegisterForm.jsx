@@ -26,23 +26,23 @@ export default function RegisterModal({ show, handleClose, setUser }) {
         const user = response.data.user;
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
-        toast.success("✅ Registration successful!");
+        toast.success("Registration successful!");
         handleClose();
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error || "❌ Registration failed.");
+        toast.error(error.response?.data?.error || "Registration failed.");
       });
   };
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Register</Modal.Title>
+        <Modal.Title>Inregistreaza-te</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group controlId="registerFirstName">
-            <Form.Label>First Name</Form.Label>
+            <Form.Label>Prenume</Form.Label>
             <Form.Control
               type="text"
               value={firstname}
@@ -51,7 +51,7 @@ export default function RegisterModal({ show, handleClose, setUser }) {
           </Form.Group>
 
           <Form.Group controlId="registerLastName">
-            <Form.Label>Last Name</Form.Label>
+            <Form.Label>Nume</Form.Label>
             <Form.Control
               type="text"
               value={lastname}
@@ -69,7 +69,7 @@ export default function RegisterModal({ show, handleClose, setUser }) {
           </Form.Group>
 
           <Form.Group controlId="registerMobile" className="mt-3">
-            <Form.Label>Mobile</Form.Label>
+            <Form.Label>Mobil</Form.Label>
             <Form.Control
               type="text"
               value={mobile}
@@ -78,7 +78,7 @@ export default function RegisterModal({ show, handleClose, setUser }) {
           </Form.Group>
 
           <Form.Group controlId="registerPassword" className="mt-3">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Parola</Form.Label>
             <Form.Control
               type="password"
               value={password}
@@ -87,7 +87,7 @@ export default function RegisterModal({ show, handleClose, setUser }) {
           </Form.Group>
 
           <Form.Group controlId="registerType" className="mt-3">
-            <Form.Label>Account Type</Form.Label>
+            <Form.Label>Tip</Form.Label>
             <Form.Select
               value={type}
               onChange={(e) => setType(Number(e.target.value))}
@@ -100,10 +100,10 @@ export default function RegisterModal({ show, handleClose, setUser }) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
-          Close
+          Inchide
         </Button>
         <Button variant="success" onClick={handleRegister}>
-          Register
+          Inregistrare
         </Button>
       </Modal.Footer>
     </Modal>

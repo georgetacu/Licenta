@@ -20,7 +20,7 @@ if (!$auto_service_id) {
     exit();
 }
 
-$stmt = $conn->prepare("SELECT id,title FROM services WHERE auto_service_id = ?");
+$stmt = $conn->prepare("SELECT id,title,price FROM services WHERE auto_service_id = ?");
 $stmt->bind_param("i", $auto_service_id);
 
 if ($stmt->execute()) {

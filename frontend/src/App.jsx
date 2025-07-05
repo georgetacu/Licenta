@@ -10,7 +10,6 @@ import DisplayAutoServices from './Components/DisplayAutoServices';
 import ManageServices from './Components/ManageServices';
 import BookingModal from './Components/BookingModal';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +18,11 @@ import MyReviews from './Components/MyReviews';
 import OwnerAppointments from './Components/OwnerAppointments';
 import CalendarPanel from "./Components/CalendarPanel";
 import UserReviews from "./Components/UserReviews";
+import OwnerApprovals from "./Components/OwnerApprovals";
+import Accounts from "./Components/Accounts";
+import AboutPage from "./Components/AboutPage";
+import Settings from "./Components/Settings";
+import AdminDashboard from "./Components/AdminDashboard";
 
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -28,16 +32,17 @@ export default function App() {
   const [showAddAutoService, setShowAddAutoService] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedHour, setSelectedHour] = useState("");
-  const [availableHours, setAvailableHours] = useState([]);
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+
 
 const handleBookingConfirm = ({ date, hour, service_id }) => {
   console.log("BookingConfirm received:", { date, hour, service_id });
 
   if (!user) {
-    alert("You must be logged in to book an appointment.");
+    alert("Trebuie sa fii logat pentru a efectua o programare.");
     return;
   }
 
@@ -58,12 +63,12 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     headers: { "Content-Type": "application/json" },
   })
   .then(() => {
-    toast.success("Appointment booked successfully!");
+    toast.success("Programarea efectuata cu succes!");
     setShowBookingModal(false);
   })
   .catch((err) => {
     console.error("Booking failed:", err);
-    toast.error("Failed to book appointment. Please try again.");
+    toast.error("Nu a putut fi efectuata programarea. Reincercati.");
   });
 };
 
@@ -85,6 +90,8 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     setUser(null);
     navigate('/');
   };
+
+  
 
   // Generate available hours for selected date
   const generateAvailableHours = (dateStr) => {
@@ -112,12 +119,12 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
 
   const handleConfirmAppointment = () => {
     if (!user || !selectedService) {
-      alert("You must be logged in and select a service.");
+      alert("Trebuie sa fii logat pentru a efectua o programare.");
       return;
     }
 
     if (!selectedDate || !selectedHour) {
-      alert("Please select date and hour.");
+      alert("Te rugam sa selectezi data si ora.");
       return;
     }
 
@@ -133,12 +140,12 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
       headers: { "Content-Type": "application/json" }
     })
       .then(() => {
-        alert("✅ Appointment booked successfully!");
+        alert("✅ Programare efectuata cu succes!");
         setShowBookingModal(false);
       })
       .catch(err => {
         console.error("Booking failed:", err);
-        alert("❌ Failed to book appointment. Please try again.");
+        alert(" Nu a putut fi efectuata programarea. Reincercati.");
       });
   };
 
@@ -148,88 +155,163 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     <div className="min-vh-100 bg-light d-flex">
       {/* Sidebar */}
       {user && (
-        <div className="bg-dark text-white p-3" style={{ width: '220px', minHeight: '100vh' }}>
-          <h5 className="mb-4">User Panel</h5>
-          <ul className="nav nav-pills flex-column mb-auto">
-             
-              <li className="nav-item mb-2">
-                {user?.type === 1 && (
-                <button className="btn btn-outline-light w-100" onClick={() => navigate('/my-appointments')}>
-                  Programarile mele
-                </button>)}
-              </li>
-              {user?.type === 1 && (
-  <button
-    className="btn btn-outline-light w-100"
-    onClick={() => navigate('/my-reviews')} // or navigate to /my-reviews page
+  <div
+    className={`d-flex flex-column text-white bg-dark p-3 sidebar ${collapsed ? 'collapsed' : ''}`}
+    style={{
+      width: collapsed ? '80px' : '250px',
+      minHeight: '100vh',
+      transition: 'width 0.3s ease',
+    }}
   >
-    Comentariile mele
+  <div className="d-flex align-items-center mb-4 justify-content-between">
+  {/* Logo on left (hide when collapsed) */}
+  {!collapsed && (
+    <img 
+      src="/src/assets/ealogo2.jpg"
+      alt="Logo"
+      style={{ width: '40px', height: '40px' }}
+    />
+  )}
+
+  {/* Collapse button on right */}
+  <button
+    className="btn btn-sm btn-outline-light"
+    onClick={() => setCollapsed(!collapsed)}
+  >
+    <i className={`bi ${collapsed ? 'bi-arrow-right-circle' : 'bi-arrow-left-circle'}`}></i>
   </button>
-)}
-            
-            {user.type === 2 && (
-              <>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-info w-100" onClick={() => setShowAddAutoService(true)}>
-                    Add Auto Service
-                  </button>
-                </li>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/manage-services')}>
-                    Manage Services
-                  </button>
-                </li>
-              </>
-            )}
-            {user.type === 3 && (
-              <>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-warning w-100" onClick={() => navigate('/owner-approvals')}>
-                    Owner Approvals
-                  </button>
-                </li>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-success w-100" onClick={() => navigate('/auto-services-approvals')}>
-                    Auto Services Approvals
-                  </button>
-                </li>
-              </>
-            )}
-            {user.type === 2 && (
-              <>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/owner-appointments')}>
-                    Programari
-                  </button>
-                </li>
-              </>
-            )}
-            {user.type === 2 && (
-              <>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/calendar')}>
-                    Calendar
-                  </button>
-                </li>
-                <li className="nav-item mb-2">
-                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/user-reviews')}>
-                    Review-uri</button>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
+</div>
+  
+    <ul className="nav nav-pills flex-column mb-auto">
+       <>
+          <li className="nav-item mb-2">
+            <button
+  className="btn btn-outline-light w-100 d-flex align-items-center"
+  onClick={() => navigate("/")}
+>
+  <i className="bi bi-house me-2"></i>
+  {!collapsed && "Acasa"}
+</button>
+          </li>
+        </>
+      {user?.type === 1 && (
+        <>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/my-appointments')}>
+              <i className="bi bi-calendar-check me-2"></i>
+              {!collapsed && "Programarile mele"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/my-reviews')}>
+              <i className="bi bi-chat-dots me-2"></i>
+              {!collapsed && "Comentariile mele"}
+            </button>
+          </li>
+        </>
       )}
+
+      {user?.type === 2 && (
+        <>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => setShowAddAutoService(true)}>
+              <i className="bi bi-plus-circle me-2"></i>
+              {!collapsed && "Adauga Service Auto"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/manage-services')}>
+              <i className="bi bi-wrench-adjustable me-2"></i>
+              {!collapsed && "Service-uri Auto"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/owner-appointments')}>
+              <i className="bi bi-calendar3 me-2"></i>
+              {!collapsed && "Programari"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/calendar')}>
+              <i className="bi bi-calendar-range me-2"></i>
+              {!collapsed && "Calendar"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/user-reviews')}>
+              <i className="bi bi-stars me-2"></i>
+              {!collapsed && "Review-uri"}
+            </button>
+          </li>
+          
+        </>
+      )}
+      {user?.type === 4 && (
+        <>
+        
+        </>
+      )}
+
+      {user?.type === 3 && (
+        <>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/owner-approvals')}>
+              <i className="bi bi-check-circle me-2"></i>
+              {!collapsed && "Aprobari Owner"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/accounts')}>
+              <i className="bi bi-people me-2"></i>
+              {!collapsed && "Conturi"}
+            </button>
+          </li>
+          <li className="nav-item mb-2">
+            <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/dashboard')}>
+              <i className="bi bi-people me-2"></i>
+              {!collapsed && "Panou de control"}
+            </button>
+          </li>
+        </>
+      )}
+      <div style={{ marginTop: 'auto' }}>
+    <li className="nav-item mb-2">
+      <button
+        className="btn btn-outline-light w-100 d-flex align-items-center"
+        onClick={() => navigate('/about')}
+      >
+        <i className="bi bi-info-square me-2"></i>
+        {!collapsed && 'Despre'}
+      </button>
+    </li>
+    <li className="nav-item mb-2">
+      <button
+        className="btn btn-outline-light w-100 d-flex align-items-center"
+        onClick={() => navigate('/settings')}
+      >
+        <i className="bi bi-gear me-2"></i>
+        {!collapsed && 'Optiuni'}
+      </button>
+    </li>
+  </div>
+
+    </ul>
+  </div>
+)}
 
       {/* Main content */}
       <div className="flex-grow-1">
+        
         <header className="p-3 bg-dark text-white">
+          
           <div className="container">
+            
             <div className="d-flex flex-wrap align-items-center justify-content-between">
               <a href="/" className="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                 <strong className="fs-4">Expert Auto</strong>
               </a>
               <div className="text-end d-flex align-items-center">
+                
                 {user ? (
                   <>
                     <span className="me-3">
@@ -259,8 +341,9 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
             path="/"
             element={
               <section className="text-center py-5 container">
-                <h1 className="display-4 mb-3">Welcome to Expert Auto</h1>
-                <p className="lead mb-5">Explore our services and book your next appointment online with ease.</p>
+                <h1 className="display-4 mb-3">Bine ai venit pe platforma Expert Auto</h1>
+                <p className="lead mb-5">Explorează serviciile noastre și programează-ți următoarea întâlnire online cu ușurință.</p>
+                
                 <DisplayAutoServices
                   user={user}
                   setSelectedService={setSelectedService}
@@ -275,6 +358,11 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
           <Route path="/owner-appointments" element={<OwnerAppointments user={user} />} />
           <Route path="/calendar" element={<CalendarPanel user={user} />} />
           <Route path="/user-reviews" element={<UserReviews user={user} />} />
+          <Route path="/owner-approvals" element={<OwnerApprovals />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/settings" element={<Settings user={user} />} />
+          <Route path="/dashboard" element={<AdminDashboard user={user} />} />
         </Routes>
         
 

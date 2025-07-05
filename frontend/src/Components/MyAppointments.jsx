@@ -14,6 +14,10 @@ export default function MyAppointments({ user }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [notification, setNotification] = useState(null);
+  const [filterDate, setFilterDate] = useState("");
+const [filterStatus, setFilterStatus] = useState("all");
+const [filterService, setFilterService] = useState("");
+
 
   const handleLeaveReview = (appointmentId) => {
     setReviewAppointmentId(appointmentId);
@@ -64,6 +68,14 @@ export default function MyAppointments({ user }) {
         console.error("Eroare la incarcarea programarilor", err);
       });
   };
+  const filteredAppointments = appointments.filter((appt) => {
+  const apptDate = appt.appointment_datetime.slice(0, 10); // ISO date format
+  const matchDate = !filterDate || apptDate === filterDate;
+  const matchStatus = filterStatus === "all" || String(appt.status) === filterStatus;
+  const matchService = !filterService || appt.auto_service_name.toLowerCase().includes(filterService.toLowerCase());
+  return matchDate && matchStatus && matchService;
+});
+
 
   const getStatusText = (status) => {
   switch (String(status)) {
@@ -200,63 +212,96 @@ const getStatusClass = (status) => {
               Nu exista programari disponibile.
             </div>
           ) : (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle">
-                <thead className="table-dark">
-                  <tr>
-                    <th>#</th>
-                    <th>Data</th>
-                    <th>Ora</th>
-                    <th>Serviciu</th>
-                    <th>Service auto</th>
-                    <th>Status</th>
-                    <th>Actiuni</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appointments.map((appt, index) => (
-                    <tr key={appt.id}>
-                      <td>{index + 1}</td>
-                      <td>{formatDate(appt.appointment_datetime)}</td>
-                      <td>{formatTime(appt.appointment_datetime)}</td>
-                      <td>{appt.service_name}</td>
-                      <td>{appt.auto_service_name}</td>
-                      <td className={getStatusClass(appt.status)}>
-                        {getStatusText(appt.status)}
-                      </td>
-                      <td>
-  {appt.status === 3 ? (
-    <button
-      className="btn btn-sm btn-primary"
-      onClick={() => handleLeaveReview(appt.id)}
-    >
-      Lasa recenzie
-    </button>
-  ) : (
-    <>
-      {(appt.status === 1 || appt.status === 2) && (
-        <button
-          className="btn btn-sm btn-danger me-2"
-          onClick={() => handleCancel(appt.id)}
-        >
-          Anuleaza
-        </button>
-      )}
-      <button
-        className="btn btn-sm btn-primary"
-        onClick={() => handleRescheduleClick(appt)}
-      >
-        Reprogrameaza
-      </button>
-    </>
-  )}
-</td>
+            <><div className="mb-3 row">
+                <div className="col-md-4">
+                  <label className="form-label">Filtrare dupa data</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)} />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label">Filtrare dupa status</label>
+                  <select
+                    className="form-select"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                  >
+                    <option value="all">Toate</option>
+                    <option value="0">Anulat</option>
+                    <option value="1">In asteptare</option>
+                    <option value="2">Confirmat</option>
+                    <option value="3">Finalizat</option>
+                  </select>
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label">Filtrare dupa service auto</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Ex: AutoMax"
+                    value={filterService}
+                    onChange={(e) => setFilterService(e.target.value)} />
+                </div>
+              </div><div className="table-responsive">
+                  <table className="table table-hover align-middle">
+                    <thead className="table-dark">
+                      <tr>
+                        <th>#</th>
+                        <th>Data</th>
+                        <th>Ora</th>
+                        <th>Serviciu</th>
+                        <th>Service auto</th>
+                        <th>Status</th>
+                        <th>Actiuni</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredAppointments.map((appt, index) => (
 
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <tr key={appt.id}>
+                          <td>{index + 1}</td>
+                          <td>{formatDate(appt.appointment_datetime)}</td>
+                          <td>{formatTime(appt.appointment_datetime)}</td>
+                          <td>{appt.service_name}</td>
+                          <td>{appt.auto_service_name}</td>
+                          <td className={getStatusClass(appt.status)}>
+                            {getStatusText(appt.status)}
+                          </td>
+                          <td>
+                            {appt.status === 3 ? (
+                              <button
+                                className="btn btn-sm btn-primary"
+                                onClick={() => handleLeaveReview(appt.id)}
+                              >
+                                Lasa recenzie
+                              </button>
+                            ) : (
+                              <>
+                                {(appt.status === 1 || appt.status === 2) && (
+                                  <button
+                                    className="btn btn-sm btn-danger me-2"
+                                    onClick={() => handleCancel(appt.id)}
+                                  >
+                                    Anuleaza
+                                  </button>
+                                )}
+                                <button
+                                  className="btn btn-sm btn-primary"
+                                  onClick={() => handleRescheduleClick(appt)}
+                                >
+                                  Reprogrameaza
+                                </button>
+                              </>
+                            )}
+                          </td>
+
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div></>
           )}
         </div>
       </div>

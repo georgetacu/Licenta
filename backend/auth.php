@@ -54,6 +54,16 @@ if ($action === 'login') {
   if ($user = $result->fetch_assoc()) {
 
     $verify = password_verify($password, $user['password']);
+    if ($user['type'] == 2 && $user['status'] == 2) {
+    http_response_code(403);
+    echo json_encode(["error" => "Cont neconfirmat. Asteptati confirmarea administratorului."]);
+    exit();
+}
+if ($user['status'] == 0) {
+    http_response_code(403);
+    echo json_encode(["error" => "Acest cont a fost dezactivat. Contactati administratorul."]);
+    exit();
+}
     file_put_contents('debug.log', "Verify result: " . ($verify ? "true" : "false") . "\n", FILE_APPEND);
 
     if ($verify) {
@@ -85,8 +95,10 @@ if ($action === 'login') {
   }
 
   // Insert new user
-  $stmt = $conn->prepare("INSERT INTO users (first_name,last_name, email, password,mobile,type,created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
-  $stmt->bind_param("ssssss", $firstname, $lastname, $email, $password, $mobile, $type);
+   $status = $type == 2 ? 2 : 1;
+  $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, mobile, type, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+$stmt->bind_param("sssssss", $firstname, $lastname, $email, $password, $mobile, $type, $status);
+
   if ($stmt->execute()) {
     echo json_encode(["message" => "Registration successful"]);
   } else {

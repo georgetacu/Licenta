@@ -7,6 +7,25 @@ export default function ManageServices({ user }) {
   const [services, setServices] = useState([]);
   const [editModal, setEditModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+const [assigningServiceId, setAssigningServiceId] = useState(null);
+const [assignForm, setAssignForm] = useState({
+  name: '',
+  email: '',
+  password: ''
+});
+const [assignMessage, setAssignMessage] = useState('');
+
+const [filters, setFilters] = useState({
+  name: '',
+  county: '',
+  serviceTitle: ''
+});
+
+const handleFilterChange = (e) => {
+  const { name, value } = e.target;
+  setFilters(prev => ({ ...prev, [name]: value }));
+};
 
   useEffect(() => {
     if (!user) return;
@@ -40,6 +59,12 @@ export default function ManageServices({ user }) {
 
   const [addServiceMessage, setAddServiceMessage] = useState('');
 
+  const handleOpenAssignModal = (serviceId) => {
+  setAssigningServiceId(serviceId);
+  setAssignForm({ name: '', email: '', password: '' });
+  setAssignMessage('');
+  setShowAssignModal(true);
+};
   
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
   const [selectedAutoServiceId, setSelectedAutoServiceId] = useState(null);
@@ -119,28 +144,72 @@ const handleDeleteLinkedService = (linkedServiceId, autoServiceId) => {
   .catch(err => console.error("Failed to delete linked service:", err));
 };
 
-console.log("Sending update for linked service:", editingLinkedService);
+const filteredServices = services.filter(service => {
+  const nameMatch = service.name.toLowerCase().includes(filters.name.toLowerCase());
+  const countyMatch = service.county.toLowerCase().includes(filters.county.toLowerCase());
+  const serviceMatch = service.linked_services?.some(ls =>
+    ls.title.toLowerCase().includes(filters.serviceTitle.toLowerCase())
+  );
+  return nameMatch && countyMatch && (!filters.serviceTitle || serviceMatch);
+});
+
 
   return (
     <div className="container py-5">
-      <h2 className="mb-4">Manage Your Auto Services</h2>
+      <h2 className="mb-4">Service-urile tale auto</h2>
+      <div className="mb-4">
+  <h5>Filtre:</h5>
+  <div className="row g-2">
+    <div className="col-md-4">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Filtrează după nume"
+        name="name"
+        value={filters.name}
+        onChange={handleFilterChange}
+      />
+    </div>
+    <div className="col-md-4">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Filtrează după județ"
+        name="county"
+        value={filters.county}
+        onChange={handleFilterChange}
+      />
+    </div>
+    <div className="col-md-4">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Filtrează după serviciu"
+        name="serviceTitle"
+        value={filters.serviceTitle}
+        onChange={handleFilterChange}
+      />
+    </div>
+  </div>
+</div>
+
       <div className="row">
        <div className="row">
-  {services.map(service => (
+  {filteredServices.map(service => (
     <div key={service.id} className="col-md-4 mb-4">
       <div className="h-100 d-flex flex-column">
         {/* Card */}
         <div className="card shadow">
           <div className="card-body">
             <h5 className="card-title">{service.name}</h5>
-            <p className="card-text mb-1"><strong>VAT:</strong> {service.VAT}</p>
+            <p className="card-text mb-1"><strong>CUI:</strong> {service.VAT}</p>
             <p className="card-text mb-1">
-              <strong>Address:</strong> {`${service.street} ${service.number}, ${service.town}, ${service.county}`}
+              <strong>Adresa:</strong> {`${service.street} ${service.number}, ${service.town}, ${service.county}`}
             </p>
           </div>
           <div className="card-footer d-flex justify-content-between">
-            <button className="btn btn-outline-primary btn-sm" onClick={() => openEditModal(service)}>Edit</button>
-            <button className="btn btn-outline-secondary btn-sm" onClick={() => openAddServiceModal(service.id)}>Add Services</button>
+            <button className="btn btn-outline-primary btn-sm" onClick={() => openEditModal(service)}>Editeaza</button>
+            <button className="btn btn-outline-secondary btn-sm" onClick={() => openAddServiceModal(service.id)}>Adauga serviciu</button>
             <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(service.id)}>Remove</button>
           </div>
         </div>
@@ -148,7 +217,7 @@ console.log("Sending update for linked service:", editingLinkedService);
         {/* Linked services below the card, but inside the same column box */}
         {service.linked_services && service.linked_services.length > 0 && (
           <div className="mt-2 px-3 py-2 border rounded bg-light">
-            <h6>Services:</h6>
+            <h6>Servicii:</h6>
             <ul className="mb-0">
   {service.linked_services.map((linked, idx) => (
     <li
@@ -174,12 +243,10 @@ console.log("Sending update for linked service:", editingLinkedService);
         >
           <FaTrash size={14} />
         </button>
-      </div>
-    </li>
-  ))}
-</ul>
-
-
+        </div>
+          </li>
+         ))}
+          </ul>
           </div>
         )}
       </div>
@@ -245,12 +312,12 @@ console.log("Sending update for linked service:", editingLinkedService);
       </Modal>
       <Modal show={showAddServiceModal} onHide={() => setShowAddServiceModal(false)}>
   <Modal.Header closeButton>
-    <Modal.Title>Add New Service</Modal.Title>
+    <Modal.Title>Adauga serviciu</Modal.Title>
   </Modal.Header>
   <Modal.Body>
     <Form>
       <Form.Group className="mb-2">
-        <Form.Label>Title</Form.Label>
+        <Form.Label>Titlu</Form.Label>
         <Form.Control
           type="text"
           value={newService.title}
@@ -258,7 +325,7 @@ console.log("Sending update for linked service:", editingLinkedService);
         />
       </Form.Group>
       <Form.Group className="mb-2">
-        <Form.Label>Description</Form.Label>
+        <Form.Label>Descriere</Form.Label>
         <Form.Control
           as="textarea"
           value={newService.description}
@@ -266,7 +333,7 @@ console.log("Sending update for linked service:", editingLinkedService);
         />
       </Form.Group>
       <Form.Group className="mb-2">
-        <Form.Label>Price</Form.Label>
+        <Form.Label>Pret</Form.Label>
         <Form.Control
           type="number"
           value={newService.price}
@@ -274,7 +341,7 @@ console.log("Sending update for linked service:", editingLinkedService);
         />
       </Form.Group>
       <Form.Group className="mb-2">
-        <Form.Label>Duration (in minutes)</Form.Label>
+        <Form.Label>Durata (in minute)</Form.Label>
         <Form.Control
           type="number"
           value={newService.duration}
@@ -289,8 +356,8 @@ console.log("Sending update for linked service:", editingLinkedService);
 )}
   </Modal.Body>
   <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowAddServiceModal(false)}>Cancel</Button>
-    <Button variant="primary" onClick={handleAddServiceSubmit}>Add Service</Button>
+    <Button variant="secondary" onClick={() => setShowAddServiceModal(false)}>Anuleaza</Button>
+    <Button variant="success" onClick={handleAddServiceSubmit}>Adauga</Button>
   </Modal.Footer>
 </Modal>
 <Modal show={editLinkedServiceModal} onHide={() => setEditLinkedServiceModal(false)}>
@@ -362,8 +429,6 @@ console.log("Sending update for linked service:", editingLinkedService);
     </Button>
   </Modal.Footer>
 </Modal>
-
-
     </div>
   );
 }

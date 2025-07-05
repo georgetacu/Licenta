@@ -7,6 +7,11 @@ export default function OwnerAppointments({ user }) {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [filterDate, setFilterDate] = useState("");
+  const [filterClient, setFilterClient] = useState("");
+  const [filterService, setFilterService] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+
   const finalizeAppointment = async (appointmentId) => {
     try {
       const res = await fetch('http://localhost/Licenta/backend/finalizeAppointment.php', {
@@ -93,13 +98,68 @@ export default function OwnerAppointments({ user }) {
     }
   };
 
+  const filteredAppointments = appointments.filter((appt) => {
+    const apptDate = new Date(appt.appointment_datetime).toISOString().split("T")[0];
+    return (
+      (!filterDate || apptDate === filterDate) &&
+      (!filterClient || appt.user_name.toLowerCase().includes(filterClient.toLowerCase())) &&
+      (!filterService || appt.service_title.toLowerCase().includes(filterService.toLowerCase())) &&
+      (!filterStatus || String(appt.status) === filterStatus)
+    );
+  });
+
   return (
     <div className="container py-5">
       <h3>Programari pentru service-ul tau</h3>
 
+      {/* FILTRARE */}
+      <div className="row mb-4">
+        <div className="col-md-3">
+          <input
+            type="date"
+            className="form-control"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            placeholder="Data"
+          />
+        </div>
+        <div className="col-md-3">
+          <input
+            type="text"
+            className="form-control"
+            value={filterClient}
+            onChange={(e) => setFilterClient(e.target.value)}
+            placeholder="Client"
+          />
+        </div>
+        <div className="col-md-3">
+          <input
+            type="text"
+            className="form-control"
+            value={filterService}
+            onChange={(e) => setFilterService(e.target.value)}
+            placeholder="Serviciu"
+          />
+        </div>
+        <div className="col-md-3">
+          <select
+            className="form-control"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="">Toate</option>
+            <option value="0">Anulat</option>
+            <option value="1">In asteptare</option>
+            <option value="2">Confirmat</option>
+            <option value="3">Finalizat</option>
+          </select>
+        </div>
+      </div>
+
+      {/* TABEL */}
       {loading ? (
         <p>Se incarca...</p>
-      ) : appointments.length === 0 ? (
+      ) : filteredAppointments.length === 0 ? (
         <p>Nu exista programari disponibile.</p>
       ) : (
         <table className="table table-striped">
@@ -114,7 +174,7 @@ export default function OwnerAppointments({ user }) {
             </tr>
           </thead>
           <tbody>
-            {appointments.map((appt, i) => (
+            {filteredAppointments.map((appt, i) => (
               <tr key={appt.id}>
                 <td>{i + 1}</td>
                 <td>{new Date(appt.appointment_datetime).toLocaleString("ro-RO", {

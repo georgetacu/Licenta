@@ -36,52 +36,49 @@ export default function AddAutoServiceForm({ show, handleClose, user }) {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Add Auto Service Location</Modal.Title>
+        <Modal.Title>Adauga Service Auto</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group className="mb-2">
-            <Form.Label>Service Name</Form.Label>
+            <Form.Label>Nume Service</Form.Label>
             <Form.Control name="name" value={form.name} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mb-2">
-            <Form.Label>Company Name</Form.Label>
+            <Form.Label>Nume Companie</Form.Label>
             <Form.Control name="company_name" value={form.company_name} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mb-2">
-            <Form.Label>VAT Number</Form.Label>
+            <Form.Label>CUI</Form.Label>
             <Form.Control name="vat" value={form.vat} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mb-2">
-            <Form.Label>County</Form.Label>
+            <Form.Label>Judet</Form.Label>
             <Form.Control name="county" value={form.county} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mb-2">
-            <Form.Label>Town</Form.Label>
+            <Form.Label>Oras</Form.Label>
             <Form.Control name="town" value={form.town} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mb-2">
-            <Form.Label>Street</Form.Label>
+            <Form.Label>Strada</Form.Label>
             <Form.Control name="street" value={form.street} onChange={handleChange} />
           </Form.Group>
 
           <Form.Group className="mb-2">
-            <Form.Label>Street Number</Form.Label>
+            <Form.Label>Numar Strada</Form.Label>
             <Form.Control name="number" value={form.number} onChange={handleChange} />
           </Form.Group>
-
-          {/* 👇 New Form Group for Working Hours */}
-          
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-        <Button variant="success" onClick={handleSubmit}>Add Auto Service</Button>
+        <Button variant="secondary" onClick={handleClose}>Anuleaza</Button>
+        <Button variant="success" onClick={handleSubmit}>Adauga Service</Button>
       </Modal.Footer>
     </Modal>
   );
