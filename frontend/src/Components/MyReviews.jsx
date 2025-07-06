@@ -7,7 +7,6 @@ export default function MyReviews({ user }) {
   const [filterDate, setFilterDate] = useState("");
   const [filterService, setFilterService] = useState("");
 
-
   useEffect(() => {
     if (!user) return;
 

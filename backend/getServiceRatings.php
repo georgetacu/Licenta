@@ -24,6 +24,6 @@ while ($row = $result->fetch_assoc()) {
   $ratings[$row['auto_service_id']] = round(floatval($row['avg_rating']), 1);
 }
 
-echo json_encode(['ratings' => $ratings]);  // <-- corectat aici
+echo json_encode(['ratings' => $ratings]);
 
 $conn->close();

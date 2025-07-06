@@ -30,21 +30,21 @@ export default function CalendarPanel({ user }) {
       const res = await fetch("http://localhost/Licenta/backend/getOwnerAppointments.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ owner_id: user.id }), // corect
+        body: JSON.stringify({ owner_id: user.id }), 
       });
       const data = await res.json();
 
       const events = data.map((appt) => {
         const start = new Date(appt.appointment_datetime);
-        const end = new Date(start.getTime() + 60 * 60 * 1000); // 1h durata
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
         return {
           id: appt.id,
           title: `${appt.service_title} - ${appt.user_name}`,
           start,
           end,
           status: appt.status,
-          auto_service_id: appt.auto_service_id,      // corect
-          auto_service_name: appt.auto_service_name,  // corect
+          auto_service_id: appt.auto_service_id,      
+          auto_service_name: appt.auto_service_name,  
         };
       });
 
@@ -54,12 +54,10 @@ export default function CalendarPanel({ user }) {
     }
   };
 
-  // Extragem service-uri auto unice pt dropdown
   const uniqueServiceAutos = Array.from(
     new Map(appointments.map((a) => [a.auto_service_id, a.auto_service_name])).entries()
   );
 
-  // Filtrare după service auto (string vs int)
   const filteredAppointments = selectedServiceAuto
     ? appointments.filter((appt) => String(appt.auto_service_id) === selectedServiceAuto)
     : appointments;
@@ -78,7 +76,6 @@ export default function CalendarPanel({ user }) {
 
 return (
   <div style={{ height: "90vh", padding: 20, display: "flex", gap: 20 }}>
-    {/* Legenda statusuri - pe stanga */}
     <div style={{ minWidth: 200 }}>
       <h5>Legenda:</h5>
       <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
@@ -153,7 +150,6 @@ return (
       </ul>
     </div>
 
-    {/* Container principal cu dropdown si calendar */}
     <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <h2>Calendar programari</h2>
 

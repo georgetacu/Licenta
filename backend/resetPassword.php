@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-include 'db.php'; // asigură-te că ai conexiunea $conn
+include 'db.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -26,7 +26,6 @@ $email = $data['email'];
 $currentPassword = $data['currentPassword'];
 $newPassword = $data['newPassword'];
 
-// 1. Verificare daca utilizatorul exista
 $stmt = $conn->prepare("SELECT id, password FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -39,13 +38,11 @@ if ($result->num_rows === 0) {
 
 $user = $result->fetch_assoc();
 
-// 2. Verificare parola curenta
 if (!password_verify($currentPassword, $user['password'])) {
     echo json_encode(['success' => false, 'error' => 'Parola curenta este gresita.']);
     exit;
 }
 
-// 3. Schimbare parola
 $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
 $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");

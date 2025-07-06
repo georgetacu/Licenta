@@ -23,7 +23,6 @@ if (!isset($data['appointment_id']) || !isset($data['status'])) {
 $appointment_id = (int)$data['appointment_id'];
 $status = (int)$data['status'];
 
-// Update appointment status
 $update = $conn->prepare("UPDATE appointments SET status = ? WHERE id = ?");
 $update->bind_param("ii", $status, $appointment_id);
 
@@ -34,7 +33,6 @@ if (!$update->execute()) {
 }
 $update->close();
 
-// Send email only when status is 2 (Approved)
 if ($status === 2) {
     $query = "
         SELECT u.email, CONCAT(u.first_name, ' ', u.last_name) AS name, s.title AS service, a.appointment_datetime
@@ -54,13 +52,6 @@ if ($status === 2) {
         $name = $user['name'];
         $service = $user['service'];
         $datetime = date("d.m.Y H:i", strtotime($user['appointment_datetime']));
-
-        $subject = "Programare Aprobată - ExpertAuto";
-        $message = "Bună $name,\n\nProgramarea ta pentru serviciul '$service' pe data de $datetime a fost aprobată.\n\nTe așteptăm la service!\n\nEchipa ExpertAuto";
-        $headers = "From: notificari.expertauto@gmail.com";
-
-        // Uncomment to enable real email sending:
-        // mail($email, $subject, $message, $headers);
     }
 }
 

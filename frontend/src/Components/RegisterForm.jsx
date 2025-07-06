@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
-import { toast } from "react-toastify"; // ✅ Import toast
+import { toast } from "react-toastify"; 
 
 export default function RegisterModal({ show, handleClose, setUser }) {
   const [firstname, setFirstName] = useState("");
@@ -9,7 +9,7 @@ export default function RegisterModal({ show, handleClose, setUser }) {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
-  const [type, setType] = useState("");
+  const [type, setType] = useState(1);
 
   const handleRegister = () => {
     axios

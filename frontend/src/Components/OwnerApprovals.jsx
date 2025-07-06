@@ -12,7 +12,7 @@ export default function OwnerApprovals() {
     .post("http://localhost/Licenta/backend/rejectOwner.php", { id })
     .then(() => {
       toast.success("Cont respins.");
-      fetchOwners(); // refresh list
+      fetchOwners();
     })
     .catch(() => toast.error("Eroare la respingere."));
 };
@@ -50,7 +50,7 @@ export default function OwnerApprovals() {
 
   return (
     <div className="container mt-4">
-      <h2>Owner Account Approvals</h2>
+      <h2>Cereri de inregistrare conturi de Detinatori</h2>
       {owners.length === 0 ? (
         <p>No pending accounts.</p>
       ) : (
@@ -66,12 +66,10 @@ export default function OwnerApprovals() {
                 Approve
               </Button>
               <Button
-  variant="danger"
-  onClick={() => handleReject(owner.id)}
-  className="ms-2"
->
-  Reject
-</Button>
+              variant="danger"
+              onClick={() => handleReject(owner.id)}
+              className="ms-2">Reject
+              </Button>
             </Card.Body>
           </Card>
         ))

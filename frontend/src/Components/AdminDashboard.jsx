@@ -36,8 +36,6 @@ const AdminDashboard = () => {
 
   const fetchOwnersServices = async () => {
     try {
-      // Aici backend-ul trebuie să returneze ceva de genul:
-      // [{ user_id, first_name, last_name, service_count }, ...]
       const res = await axios.get('http://localhost/Licenta/backend/getOwnersServicesCount.php');
       if (res.data && res.data.ownersServices) setOwnersServices(res.data.ownersServices);
     } catch (err) {
@@ -45,7 +43,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Procesare utilizatori
   const totalUsers = users.length;
   const userTypeCounts = { Utilizatori: 0, Detinatori: 0, Admini: 0 };
 
@@ -61,29 +58,28 @@ const AdminDashboard = () => {
     value: totalUsers ? parseFloat(((count / totalUsers) * 100).toFixed(1)) : 0,
   }));
 
-  // Procesare programari
   const totalAppointments = appointments.length;
   const appointmentStatusCounts = {
-    'În așteptare': 0,
-    'Acceptată': 0,
-    'Refuzată': 0,
-    'Finalizată': 0,
+    'In asteptare': 0,
+    'Acceptata': 0,
+    'Refuzata': 0,
+    'Finalizata': 0,
   };
 
   appointments.forEach(p => {
     const statusCode = parseInt(p.status);
     switch (statusCode) {
       case 0:
-        appointmentStatusCounts['În așteptare']++;
+        appointmentStatusCounts['In asteptare']++;
         break;
       case 1:
-        appointmentStatusCounts['Acceptată']++;
+        appointmentStatusCounts['Acceptata']++;
         break;
       case 2:
-        appointmentStatusCounts['Refuzată']++;
+        appointmentStatusCounts['Refuzata']++;
         break;
       case 3:
-        appointmentStatusCounts['Finalizată']++;
+        appointmentStatusCounts['Finalizata']++;
         break;
       default:
         break;
@@ -95,11 +91,8 @@ const AdminDashboard = () => {
     value: totalAppointments ? parseFloat(((count / totalAppointments) * 100).toFixed(1)) : 0,
   }));
 
-  // Procesare servicii pe detinatori
-  // Filtrăm doar cei cu > 0 servicii
   const filteredOwnersServices = ownersServices.filter(os => Number(os.service_count) > 0);
 
-  // Calculăm totalul serviciilor pentru procente
   const totalServices = filteredOwnersServices.reduce(
     (sum, owner) => sum + Number(owner.service_count),
     0
@@ -111,7 +104,6 @@ const AdminDashboard = () => {
     rawCount: Number(owner.service_count),
   }));
 
-  // Label generic pentru toate charturile cu procent (cu 1 zecimală)
   const renderLabelWithPercent = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -127,8 +119,6 @@ const AdminDashboard = () => {
   return (
     <div className="container py-5">
       <h2 className="mb-4 fw-bold text-primary">Dashboard Admin</h2>
-
-      {/* Primul rând: utilizatori și programări */}
       <div className="row g-4 mb-4">
         <div className="col-md-6">
           <div className="card shadow-sm p-3">
@@ -154,7 +144,6 @@ const AdminDashboard = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
         <div className="col-md-6">
           <div className="card shadow-sm p-3">
             <h5 className="text-center mb-3">Status programari</h5>
@@ -180,12 +169,10 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Al doilea rând: servicii per deținător */}
       <div className="row g-4">
         <div className="col-md-6 offset-md-3">
           <div className="card shadow-sm p-3">
-            <h5 className="text-center mb-3">Servicii auto per detinator</h5>
+            <h5 className="text-center mb-3">Service-uri auto per detinator</h5>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie

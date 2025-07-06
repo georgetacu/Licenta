@@ -1,6 +1,5 @@
 <?php
-// submitReview.php
-header("Access-Control-Allow-Origin: http://localhost:5173"); // allow your frontend origin
+header("Access-Control-Allow-Origin: http://localhost:5173"); 
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Credentials: true");
@@ -13,8 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit;
 }
 
-include 'db.php'; // Use your existing connection
-
+include 'db.php'; 
 
 if (!isset($data['appointment_id'], $data['user_id'], $data['rating'])) {
     echo json_encode(['error' => 'Missing required fields']);

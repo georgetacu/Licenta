@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'db.php'; // use shared DB connection
+require_once 'db.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!isset($data['id'])) {

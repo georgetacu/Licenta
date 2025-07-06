@@ -11,7 +11,7 @@ export default function AddAutoServiceForm({ show, handleClose, user }) {
     town: "",
     street: "",
     number: "",
-    working_hours: "" // 👈 Added here
+    working_hours: "" 
   });
 
   const handleChange = (e) => {

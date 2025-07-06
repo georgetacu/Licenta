@@ -3,7 +3,6 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Handle preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -24,7 +23,6 @@ if (!$first_name || !$last_name || !$email || !$password || !$serviceId) {
     exit;
 }
 
-// Check if email exists
 $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
 $check->bind_param("s", $email);
 $check->execute();
@@ -35,14 +33,12 @@ if ($check->num_rows > 0) {
     exit;
 }
 
-// Insert user
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, type) VALUES (?, ?, ?, ?, 4)");
 $stmt->bind_param("ssss", $first_name, $last_name, $email, $hashedPassword);
 if ($stmt->execute()) {
     $newUserId = $stmt->insert_id;
 
-    // Assign user to service
     $update = $conn->prepare("UPDATE auto_services SET assigned_user = ? WHERE id = ?");
     $update->bind_param("ii", $newUserId, $serviceId);
     $update->execute();

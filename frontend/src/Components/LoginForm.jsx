@@ -18,12 +18,12 @@ export default function LoginModal({ show, handleClose, setUser }) {
         const user = response.data.user;
         localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
-        toast.success("✅ Login successful!", { position: "bottom-left" }); // 👈 Positioned toast
+        toast.success("Conectare reusita!", { position: "bottom-left" }); 
         handleClose();
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error || "❌ Login failed.", {
-          position: "bottom-left", // 👈 Consistent position
+        toast.error(error.response?.data?.error || "Conectare esuata.", {
+          position: "bottom-left", 
         });
       });
   };
@@ -36,7 +36,7 @@ export default function LoginModal({ show, handleClose, setUser }) {
       <Modal.Body>
         <Form>
           <Form.Group controlId="loginEmail">
-            <Form.Label>Email address</Form.Label>
+            <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
               value={email}
@@ -45,7 +45,7 @@ export default function LoginModal({ show, handleClose, setUser }) {
           </Form.Group>
 
           <Form.Group controlId="loginPassword" className="mt-3">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Parola</Form.Label>
             <Form.Control
               type="password"
               value={password}
@@ -56,7 +56,7 @@ export default function LoginModal({ show, handleClose, setUser }) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
-          Close
+          Inchide
         </Button>
         <Button variant="primary" onClick={handleLogin}>
           Login

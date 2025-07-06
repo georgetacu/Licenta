@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -46,12 +45,9 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     return;
   }
 
-  // Create a Date object from the selected date
+  const navigate = useNavigate();
   const appointmentDateTime = new Date(date);
-
-  // Extract hours and minutes from the `hour` string (e.g. "14:00")
   const [h, m] = hour.split(":");
-
   appointmentDateTime.setHours(parseInt(h), parseInt(m), 0, 0);
 
   axios.post("http://localhost/Licenta/backend/bookAppointment.php", {
@@ -72,10 +68,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
   });
 };
 
-
-
-  const navigate = useNavigate();
-
   useEffect(() => {
     try {
       const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -91,9 +83,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     navigate('/');
   };
 
-  
-
-  // Generate available hours for selected date
   const generateAvailableHours = (dateStr) => {
     const hours = [];
     const now = new Date();
@@ -113,7 +102,7 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
   useEffect(() => {
     if (selectedDate) {
       setAvailableHours(generateAvailableHours(selectedDate));
-      setSelectedHour(""); // Reset hour on date change
+      setSelectedHour("");
     }
   }, [selectedDate]);
 
@@ -140,11 +129,11 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
       headers: { "Content-Type": "application/json" }
     })
       .then(() => {
-        alert("✅ Programare efectuata cu succes!");
+        alert(" Programare efectuata cu succes!");
         setShowBookingModal(false);
       })
       .catch(err => {
-        console.error("Booking failed:", err);
+        console.error("Programare esuata:", err);
         alert(" Nu a putut fi efectuata programarea. Reincercati.");
       });
   };
@@ -153,7 +142,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
 
   return (
     <div className="min-vh-100 bg-light d-flex">
-      {/* Sidebar */}
       {user && (
   <div
     className={`d-flex flex-column text-white bg-dark p-3 sidebar ${collapsed ? 'collapsed' : ''}`}
@@ -164,7 +152,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     }}
   >
   <div className="d-flex align-items-center mb-4 justify-content-between">
-  {/* Logo on left (hide when collapsed) */}
   {!collapsed && (
     <img 
       src="/src/assets/ealogo2.jpg"
@@ -172,8 +159,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
       style={{ width: '40px', height: '40px' }}
     />
   )}
-
-  {/* Collapse button on right */}
   <button
     className="btn btn-sm btn-outline-light"
     onClick={() => setCollapsed(!collapsed)}
@@ -269,7 +254,7 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
           <li className="nav-item mb-2">
             <button className="btn btn-outline-light w-100 d-flex align-items-center" onClick={() => navigate('/dashboard')}>
               <i className="bi bi-people me-2"></i>
-              {!collapsed && "Panou de control"}
+              {!collapsed && "Dashboard"}
             </button>
           </li>
         </>
@@ -298,8 +283,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
     </ul>
   </div>
 )}
-
-      {/* Main content */}
       <div className="flex-grow-1">
         
         <header className="p-3 bg-dark text-white">
@@ -315,7 +298,7 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
                 {user ? (
                   <>
                     <span className="me-3">
-                      Welcome, {user.first_name} ({user.type === 1 ? "User" : user.type === 2 ? "Owner" : "Admin"})!
+                      Bine ai venit, {user.first_name}!
                     </span>
                     <button className="btn btn-danger" onClick={handleLogout}>
                       Logout
@@ -335,7 +318,6 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
             </div>
           </div>
         </header>
-
         <Routes>
           <Route
             path="/"
@@ -364,16 +346,11 @@ const handleBookingConfirm = ({ date, hour, service_id }) => {
           <Route path="/settings" element={<Settings user={user} />} />
           <Route path="/dashboard" element={<AdminDashboard user={user} />} />
         </Routes>
-        
-
       </div>
-
-      {/* Modals */}
       <LoginModal show={showLogin} handleClose={() => setShowLogin(false)} setUser={setUser} />
       <RegisterModal show={showRegister} handleClose={() => setShowRegister(false)} setUser={setUser} />
       <AddServiceForm show={showAddService} handleClose={() => setShowAddService(false)} user={user} />
       <AddAutoServiceForm show={showAddAutoService} handleClose={() => setShowAddAutoService(false)} user={user} />
-
       <BookingModal
   show={showBookingModal}
   handleClose={() => setShowBookingModal(false)}

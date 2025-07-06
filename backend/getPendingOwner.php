@@ -9,9 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'db.php'; // use shared DB connection
+require_once 'db.php'; 
 
-// Get pending owners: type = 2 AND status = 2
 $result = $conn->query("SELECT * FROM users WHERE type = 2 AND status = 2");
 $owners = [];
 

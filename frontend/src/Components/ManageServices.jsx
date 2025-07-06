@@ -78,7 +78,7 @@ const handleFilterChange = (e) => {
 const openAddServiceModal = (autoServiceId) => {
   setSelectedAutoServiceId(autoServiceId);
   setShowAddServiceModal(true);
-  setNewService({ title: '', description: '', price: '', duration: '' }); // Reset form
+  setNewService({ title: '', description: '', price: '', duration: '' }); 
 };
 
 const handleAddServiceSubmit = () => {
@@ -89,14 +89,12 @@ const handleAddServiceSubmit = () => {
 
   axios.post("http://localhost/Licenta/backend/addServiceToAutoService.php", payload)
     .then(() => {
-      setAddServiceMessage("✅ Service added successfully!");
+      setAddServiceMessage(" Service adaugat!");
       setNewService({ title: '', description: '', price: '', duration: '' });
 
-      // Refresh the services
       axios.post("http://localhost/Licenta/backend/getUserAutoServices.php", { user_id: user.id })
         .then(res => setServices(res.data));
 
-      // Auto-close modal after 2 seconds
       setTimeout(() => {
         setShowAddServiceModal(false);
         setAddServiceMessage('');
@@ -104,7 +102,7 @@ const handleAddServiceSubmit = () => {
     })
     .catch(err => {
       console.error("Error adding service:", err);
-      setAddServiceMessage("❌ Failed to add service. Please try again.");
+      setAddServiceMessage("Operatiune esuata. Reincercati!");
     });
 };
 
@@ -120,8 +118,6 @@ const handleEditLinkedService = (autoServiceId, linkedService) => {
   duration_minutes: Number(linkedService.duration_minutes),
   auto_service_id: autoServiceId
 });
-console.log("Linked service being edited:", linkedService);
-
 
   setEditLinkedServiceModal(true);
 };
@@ -153,7 +149,6 @@ const filteredServices = services.filter(service => {
   return nameMatch && countyMatch && (!filters.serviceTitle || serviceMatch);
 });
 
-
   return (
     <div className="container py-5">
       <h2 className="mb-4">Service-urile tale auto</h2>
@@ -164,7 +159,7 @@ const filteredServices = services.filter(service => {
       <input
         type="text"
         className="form-control"
-        placeholder="Filtrează după nume"
+        placeholder="Filtreaza dupa nume"
         name="name"
         value={filters.name}
         onChange={handleFilterChange}
@@ -174,7 +169,7 @@ const filteredServices = services.filter(service => {
       <input
         type="text"
         className="form-control"
-        placeholder="Filtrează după județ"
+        placeholder="Filtreaza dupa judet"
         name="county"
         value={filters.county}
         onChange={handleFilterChange}
@@ -184,7 +179,7 @@ const filteredServices = services.filter(service => {
       <input
         type="text"
         className="form-control"
-        placeholder="Filtrează după serviciu"
+        placeholder="Filtreaza dupa serviciu"
         name="serviceTitle"
         value={filters.serviceTitle}
         onChange={handleFilterChange}
@@ -198,7 +193,6 @@ const filteredServices = services.filter(service => {
   {filteredServices.map(service => (
     <div key={service.id} className="col-md-4 mb-4">
       <div className="h-100 d-flex flex-column">
-        {/* Card */}
         <div className="card shadow">
           <div className="card-body">
             <h5 className="card-title">{service.name}</h5>
@@ -210,11 +204,9 @@ const filteredServices = services.filter(service => {
           <div className="card-footer d-flex justify-content-between">
             <button className="btn btn-outline-primary btn-sm" onClick={() => openEditModal(service)}>Editeaza</button>
             <button className="btn btn-outline-secondary btn-sm" onClick={() => openAddServiceModal(service.id)}>Adauga serviciu</button>
-            <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(service.id)}>Remove</button>
+            <button className="btn btn-outline-danger btn-sm" onClick={() => handleRemove(service.id)}>Sterge</button>
           </div>
         </div>
-
-        {/* Linked services below the card, but inside the same column box */}
         {service.linked_services && service.linked_services.length > 0 && (
           <div className="mt-2 px-3 py-2 border rounded bg-light">
             <h6>Servicii:</h6>
@@ -253,10 +245,7 @@ const filteredServices = services.filter(service => {
     </div>
   ))}
 </div>
-
       </div>
-
-      {/* Edit Modal */}
       <Modal show={editModal} onHide={() => setEditModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Auto Service</Modal.Title>
@@ -407,7 +396,6 @@ const filteredServices = services.filter(service => {
       onClick={() => {
         axios.post("http://localhost/Licenta/backend/updateLinkedService.php", editingLinkedService)
           .then(() => {
-            // Update local state
             setServices(prev =>
               prev.map(service =>
                 service.id === editingLinkedService.auto_service_id

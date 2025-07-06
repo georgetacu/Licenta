@@ -14,21 +14,16 @@ const DisplayAutoServices = ({
   const [expandedServiceId, setExpandedServiceId] = useState(null);
   const [serviceList, setServiceList] = useState({});
 
-  // Filters
   const [searchTerm, setSearchTerm] = useState("");
-  const [serviceFilter, setServiceFilter] = useState("");  // filter by service title
+  const [serviceFilter, setServiceFilter] = useState("");  
   const [addressFilter, setAddressFilter] = useState("");
-  const [ratingFilter, setRatingFilter] = useState("");  // assuming rating is a number field
+  const [ratingFilter, setRatingFilter] = useState("");  
 
-  // Fetch services and ratings
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch auto services
         const resServices = await fetch('http://localhost/Licenta/backend/getAutoServices.php');
         const servicesData = await resServices.json();
-
-        // Fetch ratings
         const resRatings = await fetch('http://localhost/Licenta/backend/getServiceRatings.php');
         const ratingsData = await resRatings.json();
 
@@ -86,7 +81,6 @@ const DisplayAutoServices = ({
     setExpandedServiceId(serviceId);
   };
 
-  // Helper function to check if a service's services match the serviceFilter
   const serviceMatchesFilter = (service) => {
     if (!serviceFilter) return true;
     const servicesForThisAuto = serviceList[service.id] || [];
@@ -95,26 +89,20 @@ const DisplayAutoServices = ({
     );
   };
 
-  // Filtered list based on all filters
   const filteredServices = autoServices.filter(service => {
-    // Filter by name (searchTerm)
     if (!service.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
 
-    // Filter by address (check if any address field matches the filter)
     const fullAddress = `${service.street} ${service.number} ${service.town} ${service.county}`.toLowerCase();
     if (addressFilter && !fullAddress.includes(addressFilter.toLowerCase())) return false;
 
-    // Filter by rating (assuming rating is a number)
     if (ratingFilter) {
       const ratingNumber = parseFloat(ratingFilter);
-      if (isNaN(ratingNumber)) return true; // ignore invalid input
+      if (isNaN(ratingNumber)) return true; 
       const serviceRating = ratings[service.id] || 0;
       if (serviceRating < ratingNumber) return false;
     }
 
-    // Filter by services (only check if the filter is set and serviceList is loaded for that service)
     if (serviceFilter && !serviceMatchesFilter(service)) return false;
-
     return true;
   });
 
@@ -132,8 +120,6 @@ const DisplayAutoServices = ({
   return (
     <div className="container-fluid py-4 px-3">
       <h2 className="text-center mb-3">Service-uri Auto Inregistrate</h2>
-
-      {/* Filters */}
       <div className="row g-3 mb-3">
         <div className="col-12 col-md-12">
           <input
@@ -221,8 +207,6 @@ const DisplayAutoServices = ({
                     </div>
                   </div>
                 </div>
-
-                {/* Service list display */}
                 {expandedServiceId === service.id && (
                   <div className="card-footer">
                     {(serviceList[service.id] && serviceList[service.id].length > 0) ? (

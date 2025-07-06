@@ -4,8 +4,6 @@ import axios from "axios";
 export default function UserReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Stări filtrare
   const [selectedAutoService, setSelectedAutoService] = useState("");
   const [selectedService, setSelectedService] = useState("");
   const [userFilter, setUserFilter] = useState("");
@@ -31,17 +29,14 @@ export default function UserReviews() {
     }
   };
 
-  // Extragem service-uri auto unice
   const uniqueAutoServices = Array.from(
     new Set(reviews.map(r => r.auto_service_name).filter(Boolean))
   );
 
-  // Extragem servicii unice
   const uniqueServices = Array.from(
     new Set(reviews.map(r => r.service_title).filter(Boolean))
   );
 
-  // Filtrare recenzii
   const filteredReviews = reviews.filter((r) => {
     const userMatch = r.user_name?.toLowerCase().includes(userFilter.toLowerCase());
     const ratingMatch = selectedRating === "" || Number(r.rating) === Number(selectedRating);
@@ -54,7 +49,6 @@ export default function UserReviews() {
     <div className="container py-5">
       <h3 className="mb-4">Recenzii de la utilizatori</h3>
 
-      {/* Filtre inline */}
       <div className="d-flex gap-3 mb-4 flex-wrap" style={{ maxWidth: 900 }}>
         <div>
           <select

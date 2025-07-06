@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
 
-include 'db.php'; // Your DB connection
+include 'db.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -18,7 +18,6 @@ if (!$name || !$description || !$price || !$user_id) {
   exit;
 }
 
-// Get the auto_service ID for this user
 $autoServiceQuery = $conn->prepare("SELECT id FROM auto_services WHERE user_id = ?");
 $autoServiceQuery->bind_param("i", $user_id);
 $autoServiceQuery->execute();

@@ -1,9 +1,6 @@
-// BookingModal.jsx
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
-
-
 export default function BookingModal({ show, handleClose, onBook, autoServiceId }) {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedHour, setSelectedHour] = useState("");
@@ -11,7 +8,6 @@ export default function BookingModal({ show, handleClose, onBook, autoServiceId 
   const [availableServices, setAvailableServices] = useState([]);
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const services = Array.isArray(availableServices) ? availableServices : [];
-
 
 useEffect(() => {
   if (!autoServiceId) return;
@@ -32,8 +28,6 @@ useEffect(() => {
     }
 
     setAvailableServices(servicesArray);
-
-    // Reset selectedServiceId only if it's not in the new services list
     if (!servicesArray.some(s => s.id === selectedServiceId)) {
       setSelectedServiceId("");
     }
@@ -44,12 +38,10 @@ useEffect(() => {
   });
 }, [autoServiceId]);
 
-
-
   useEffect(() => {
     if (selectedDate) {
       generateAvailableHours(selectedDate);
-      setSelectedHour(""); // reset selected hour when date changes
+      setSelectedHour(""); 
     } else {
       setAvailableHours([]);
       setSelectedHour("");
@@ -88,14 +80,12 @@ useEffect(() => {
   };
 
   return (
-    
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
         <Modal.Title>Efectueaza o programare</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
-        
           <Form.Group className="mb-3">
             <Form.Label>Selecteaza Data</Form.Label>
             <Form.Control
@@ -105,7 +95,6 @@ useEffect(() => {
               onChange={(e) => setSelectedDate(e.target.value)}
             />
           </Form.Group>
-
           <Form.Group className="mb-3">
             <Form.Label>Selecteaza Ora</Form.Label>
             <Form.Select
@@ -121,23 +110,21 @@ useEffect(() => {
               ))}
             </Form.Select>
           </Form.Group>
-
           <Form.Group className="mb-3">
             <Form.Label>Selecteaza Serviciul</Form.Label>
             <Form.Select
-  value={selectedServiceId}
-  onChange={(e) => setSelectedServiceId(e.target.value)}
-  disabled={availableServices.length === 0}
->
-  <option value="">
-    {availableServices.length === 0 ? "Nu sunt servicii valabile" : " - "}
-  </option>
-  {availableServices.map((service) => (
-    <option key={service.id} value={service.id}>
-      {service.title} - {service.price} RON
-    </option>
-  ))}
-</Form.Select>
+              value={selectedServiceId}
+              onChange={(e) => setSelectedServiceId(e.target.value)}
+              disabled={availableServices.length === 0}>
+              <option value="">
+                {availableServices.length === 0 ? "Nu sunt servicii valabile" : " - "}
+              </option>
+                {availableServices.map((service) => (
+              <option key={service.id} value={service.id}>
+              {service.title} - {service.price} RON
+              </option>
+            ))}
+          </Form.Select>
 
           </Form.Group>
         </Form>
@@ -149,9 +136,7 @@ useEffect(() => {
         <Button
           variant="success"
           onClick={handleBooking}
-          disabled={!selectedDate || !selectedHour || !selectedServiceId}
-        >
-          Efectueaza
+          disabled={!selectedDate || !selectedHour || !selectedServiceId}>Efectueaza
         </Button>
       </Modal.Footer>
     </Modal>

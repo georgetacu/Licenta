@@ -69,7 +69,7 @@ const [filterService, setFilterService] = useState("");
       });
   };
   const filteredAppointments = appointments.filter((appt) => {
-  const apptDate = appt.appointment_datetime.slice(0, 10); // ISO date format
+  const apptDate = appt.appointment_datetime.slice(0, 10); 
   const matchDate = !filterDate || apptDate === filterDate;
   const matchStatus = filterStatus === "all" || String(appt.status) === filterStatus;
   const matchService = !filterService || appt.auto_service_name.toLowerCase().includes(filterService.toLowerCase());
@@ -86,7 +86,7 @@ const [filterService, setFilterService] = useState("");
     case "2":
       return "Confirmat";
     case "3":
-      return "Finalizat";   // New case for finalized
+      return "Finalizat";   
     default:
       return "Necunoscut";
   }
@@ -101,14 +101,12 @@ const getStatusClass = (status) => {
     case "2":
       return "bg-success text-white";
     case "3":
-      return "bg-success text-white";  // Green for finalized too
+      return "bg-success text-white";  
     default:
       return "";
   }
 };
 
-
-  // Generate available hours for rescheduling (9 to 18, future times only)
   const generateAvailableHours = (dateStr) => {
     const hours = [];
     const now = new Date();
@@ -125,13 +123,11 @@ const getStatusClass = (status) => {
     setSelectedHour("");
   };
 
-  // When date changes in modal
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
     if (e.target.value) generateAvailableHours(e.target.value);
   };
 
-  // Open reschedule modal and set initial date/time
   const handleRescheduleClick = (appt) => {
     setSelectedAppt(appt);
     const dt = new Date(appt.appointment_datetime);
@@ -145,7 +141,6 @@ const getStatusClass = (status) => {
     setShowRescheduleModal(true);
   };
 
-  // Confirm reschedule
   const handleRescheduleConfirm = () => {
     if (!selectedDate || !selectedHour) {
       alert("Selecteaza data si ora pentru reprogamare.");
@@ -166,24 +161,23 @@ const getStatusClass = (status) => {
       });
   };
 
-  // Cancel appointment with confirmation
   const handleCancel = (appointmentId) => {
-    const confirmCancel = window.confirm(
-      "Esti sigur ca doresti sa anulezi programarea?"
-    );
-    if (!confirmCancel) return;
+  const confirmCancel = window.confirm(
+    "Esti sigur ca doresti sa anulezi programarea?"
+  );
+  if (!confirmCancel) return;
 
-    axios
-      .put(`http://localhost:8000/api/appointments/${appointmentId}/cancel`)
-      .then(() => {
-        fetchAppointments();
-      })
-      .catch((error) => {
-        console.error("Eroare la anulare:", error);
-      });
-  };
-
-  // Format date dd-MM-yyyy
+  axios
+    .post(`http://localhost/Licenta/backend/cancelAppointment.php`, {
+      appointment_id: appointmentId,
+    })
+    .then(() => {
+      fetchAppointments();
+    })
+    .catch((error) => {
+      console.error("Eroare la anulare:", error);
+    });
+};
   const formatDate = (datetimeStr) => {
     const dt = new Date(datetimeStr);
     const day = dt.getDate().toString().padStart(2, "0");
@@ -305,8 +299,6 @@ const getStatusClass = (status) => {
           )}
         </div>
       </div>
-
-      {/* Reschedule Modal */}
       <Modal
         show={showRescheduleModal}
         onHide={() => setShowRescheduleModal(false)}
@@ -355,7 +347,6 @@ const getStatusClass = (status) => {
           </Button>
         </Modal.Footer>
       </Modal>
-       {/* Review Modal */}
       <Modal show={reviewModalShow} onHide={() => setReviewModalShow(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Lasa o recenzie</Modal.Title>
@@ -387,8 +378,6 @@ const getStatusClass = (status) => {
           <Button variant="primary" onClick={submitReview}>Trimite recenzia</Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Notification */}
       {notification && (
         <div className={`alert alert-${notification.type === "success" ? "success" : "danger"} fixed-bottom m-3`}>
           {notification.message}
